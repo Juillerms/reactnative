@@ -1,9 +1,8 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { VEHICLES } from '@/constants/mockData';
 import { FontAwesome5 } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ThemedText } from './themed-text';
 
 interface Props {
   selectedId: string | null;
@@ -12,96 +11,106 @@ interface Props {
 
 export default function VehicleSelector({ selectedId, onSelect }: Props) {
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="subtitle" style={styles.header}>Escolha o veículo</ThemedText>
+    <View style={styles.container}>
+      <ThemedText type="defaultSemiBold" style={styles.title}>Escolha o porte:</ThemedText>
       
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.list}>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         {VEHICLES.map((vehicle) => {
           const isSelected = selectedId === vehicle.id;
           
           return (
-            <TouchableOpacity 
-              key={vehicle.id} 
-              onPress={() => onSelect(vehicle.id)}
-              activeOpacity={0.7}
+            <TouchableOpacity
+              key={vehicle.id}
               style={[
-                styles.card, 
+                styles.card,
                 isSelected && styles.cardSelected
               ]}
+              onPress={() => onSelect(vehicle.id)}
+              activeOpacity={0.7}
             >
-              <View style={styles.iconContainer}>
+              {/* Ícone com Círculo de Fundo */}
+              <View style={[styles.iconCircle, isSelected && { backgroundColor: '#e1f5fe' }]}>
                 <FontAwesome5 
-                  name={vehicle.icon} 
+                  name={vehicle.id === 'moto' ? 'motorcycle' : 'truck'} 
                   size={24} 
-                  color={isSelected ? '#fff' : '#0a7ea4'} 
+                  color={isSelected ? '#0a7ea4' : '#999'} 
                 />
               </View>
-              
-              <View>
-                {/* Título: Usei uma cor explícita para garantir contraste */}
-                <ThemedText type="defaultSemiBold" style={{color: isSelected ? '#fff' : '#111'}}>
+
+              <View style={styles.info}>
+                <ThemedText style={[styles.vehicleName, isSelected && { color: '#0a7ea4', fontWeight: 'bold' }]}>
                   {vehicle.title}
                 </ThemedText>
-                
-                <ThemedText style={[styles.price, isSelected ? {color: '#fff'} : {color: '#0a7ea4'}]}>
+                <ThemedText style={styles.price}>
                   R$ {vehicle.price.toFixed(2)}
                 </ThemedText>
-                
-                {/* MUDANÇA AQUI: Cinza #444 muito mais escuro para leitura */}
-                <ThemedText style={[styles.capacity, isSelected ? {color: '#e0e0e0'} : {color: '#444'}]}>
-                  {vehicle.capacity}
+                <ThemedText style={styles.capacity}>
+                  até {vehicle.capacity}kg
                 </ThemedText>
+              </View>
+              
+              {/* Checkbox Visual */}
+              <View style={[styles.radio, isSelected && styles.radioSelected]}>
+                {isSelected && <View style={styles.radioInner} />}
               </View>
             </TouchableOpacity>
           );
         })}
       </ScrollView>
-    </ThemedView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 20,
-    backgroundColor: 'transparent'
-  },
-  header: {
-    paddingHorizontal: 20,
-    marginBottom: 10,
-    color: '#333333',
-  },
-  list: {
-    paddingHorizontal: 20,
-    gap: 12,
-  },
+  container: { marginBottom: 20 },
+  title: { marginBottom: 12, color: '#333', paddingHorizontal: 4 },
+  scrollContent: { paddingRight: 20, paddingBottom: 10 }, // Espaço para sombra não cortar
+  
   card: {
     width: 140,
+    backgroundColor: '#fff',
+    borderRadius: 16,
     padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#fff', 
-    borderWidth: 1,
-    borderColor: '#ccc', // Borda mais escura para contraste
-    gap: 8,
+    marginRight: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    // Sombra suave
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15, // Sombra um pouco mais forte
+    shadowOpacity: 0.05,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 2,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 180
   },
   cardSelected: {
-    backgroundColor: '#0a7ea4',
     borderColor: '#0a7ea4',
+    backgroundColor: '#fbfdfd'
   },
-  iconContainer: {
-    marginBottom: 4,
+  
+  iconCircle: {
+    width: 48, height: 48, borderRadius: 24,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center', alignItems: 'center',
+    marginBottom: 8
   },
-  price: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 4,
+  
+  info: { alignItems: 'center' },
+  vehicleName: { fontSize: 14, color: '#666', marginBottom: 4, textAlign: 'center' },
+  price: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+  capacity: { fontSize: 10, color: '#999', marginTop: 2 },
+
+  radio: {
+    width: 20, height: 20, borderRadius: 10,
+    borderWidth: 2, borderColor: '#ddd',
+    marginTop: 10,
+    justifyContent: 'center', alignItems: 'center'
   },
-  capacity: {
-    fontSize: 13, // Aumentei levemente a fonte
-    fontWeight: '500', // Um pouco mais de peso na fonte
-  }
+  radioSelected: { borderColor: '#0a7ea4' },
+  radioInner: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#0a7ea4' }
 });
